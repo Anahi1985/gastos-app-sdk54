@@ -1,50 +1,96 @@
-# Welcome to your Expo app 👋
+# Gastos App — SDK 54 · Tema (Clase 5)
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Aplicación de registro de gastos en **Expo SDK 54 / React Native** que trabaja con un **tema global claro/oscuro** y una **paleta de marca centralizada** con colores por categoría.
 
-## Get started
+## Qué se aplicó en esta clase
 
-1. Install dependencies
+- Tema claro/oscuro global controlado por un `ThemeProvider` propio.
+- **Paleta centralizada**: todos los `#` de color viven en `constants/theme.ts`.
+- Traducción automática de la paleta al tema Material 3 de `react-native-paper`.
+- `StatusBar` que invierte el color de los íconos según el tema.
+- Colores de las categorías del catálogo (comida, hogar, transporte…).
 
-   ```bash
-   npm install
-   ```
+### Regla de oro
 
-2. Start the app
+> Ningún color con `#` fuera de `constants/theme.ts`.
 
-   ```bash
-   npx expo start
-   ```
+Si un componente necesita un color, siempre sale de `useTheme()` (colores de marca) o de `categoryColors` (categoría). Así el tema se mantiene consistente y es fácil de cambiar.
 
-In the output, you'll find options to open the app in a
+## Archivos clave
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+constants/theme.ts        # Paleta de marca (light/dark), colores de categorías, getPaperTheme()
+context/ThemeContext.tsx  # ThemeProvider + hook useTheme()
+app/_layout.tsx           # Aplicación del tema (Provider de Paper + StatusBar)
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### `constants/theme.ts`
 
-## Learn more
+- **`lightColors`** — paleta clara: fondo violeta/grisáceo suave, tarjetas blancas, texto azul/violeta muy oscuro, acento púrpura `#6D28D9`.
+- **`darkColors`** — paleta oscura del mismo tipo (`Colors`): fondo violeta nocturno profundo, superficies elevadas, acento violeta pastel `#A78BFA`.
+- **`categoryColors`** — un color por categoría (comida, hogar, transporte, salud, educación, vestimenta, servicios, entretenimiento, impuestos, mascotas, otro).
+- **`getPaperTheme(colors, scheme)`** — construye un `MD3Theme` para `react-native-paper` usando como base el tema claro u oscuro de Paper y sobreescribiendo sus `colors` con la paleta de marca (`primary`, `surface`, `background`, `elevation`, etc.).
 
-To learn more about developing your project with Expo, look at the following resources:
+```ts
+import { getPaperTheme } from "@/constants/theme";
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+const paperTheme = getPaperTheme(colors, theme); // colors: lightColors | darkColors
+```
 
-## Join the community
+### `context/ThemeContext.tsx`
 
-Join our community of developers creating universal apps.
+- **`ThemeProvider`** — guarda el estado del tema (`"light" | "dark"`) y lo comparte por Context.
+- **`useTheme()`** — hook propio que devuelve `{ theme, colors, toggleTheme }`. Lanza un error si se usa fuera de un `<ThemeProvider>`.
+- **¿Por qué `useMemo` y `useCallback`?** — sin `useMemo`, `value` sería un objeto nuevo en cada render del Provider y **todos** los consumidores se re-renderizarían aunque el tema no cambiara. `useCallback` mantiene estable la identidad de `toggleTheme`.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+```tsx
+const { theme, colors, toggleTheme } = useTheme();
+```
+
+### `app/_layout.tsx`
+
+Orden de providers:
+
+```tsx
+<ThemeProvider>
+  <SafeAreaProvider>
+    <PaperProvider theme={getPaperTheme(colors, theme)}>
+      <StatusBar style={theme === "dark" ? "light" : "dark"} />
+      <TabNavigator />
+    </PaperProvider>
+  </SafeAreaProvider>
+</ThemeProvider>
+```
+
+- `SafeAreaProvider` → necesario para `SafeAreaView`.
+- `PaperProvider` → aplica la paleta de marca a `react-native-paper`.
+- `StatusBar` → fondo oscuro → íconos claros, y viceversa.
+
+## Uso en las pantallas
+
+Los componentes consumen el tema con `useTheme()`:
+
+```tsx
+import { useTheme } from "@/context/ThemeContext";
+
+function Tarjeta() {
+  const { colors } = useTheme();
+
+  return <View style={{ backgroundColor: colors.card }}>
+    <Text style={{ color: colors.text }}>Total</Text>
+  </View>;
+}
+```
+
+## Evidencia de funcionamiento
+
+- El toggle 🌙 en el header de **Gastos** cambia entre claro y oscuro al instante.
+- Verificado en el emulador (dump de la UI): título de pantalla único, encabezados sin superposiciones, y paleta aplicada correctamente en ambos modos.
+- Sin errores de JS en el bundle tras el cambio.
+
+## Verificación del proyecto
+
+```bash
+npx expo lint        # lint
+npx tsc --noEmit     # typecheck
+```
