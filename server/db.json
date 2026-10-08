@@ -1,0 +1,130 @@
+{
+  "gastos": [
+    {
+      "id": 1,
+      "lugar": "Supermercado",
+      "categoria": "comida",
+      "monto": 5000,
+      "fecha": "2026-10-06"
+    },
+    {
+      "id": 2,
+      "lugar": "Ferretería",
+      "categoria": "hogar",
+      "monto": 2500,
+      "fecha": "2026-10-06"
+    },
+    {
+      "id": 3,
+      "lugar": "Estación de servicio",
+      "categoria": "transporte",
+      "monto": 12000,
+      "fecha": "2026-10-05"
+    },
+    {
+      "id": 4,
+      "lugar": "Farmacia",
+      "categoria": "salud",
+      "monto": 4500,
+      "fecha": "2026-10-05"
+    },
+    {
+      "id": 5,
+      "lugar": "Verdulería",
+      "categoria": "comida",
+      "monto": 3200,
+      "fecha": "2026-10-04"
+    },
+    {
+      "id": 6,
+      "lugar": "Librería",
+      "categoria": "educacion",
+      "monto": 1800,
+      "fecha": "2026-10-03"
+    },
+    {
+      "id": 7,
+      "lugar": "Carnicería",
+      "categoria": "comida",
+      "monto": 8500,
+      "fecha": "2026-10-03"
+    },
+    {
+      "id": 8,
+      "lugar": "Almacén",
+      "categoria": "comida",
+      "monto": 1200,
+      "fecha": "2026-10-02"
+    },
+    {
+      "id": 9,
+      "lugar": "Panadería",
+      "categoria": "comida",
+      "monto": 2100,
+      "fecha": "2026-10-02"
+    },
+    {
+      "id": 10,
+      "lugar": "Veterinaria",
+      "categoria": "mascotas",
+      "monto": 9500,
+      "fecha": "2026-10-01"
+    },
+    {
+      "id": 11,
+      "lugar": "Cine",
+      "categoria": "entretenimiento",
+      "monto": 7000,
+      "fecha": "2026-10-01"
+    },
+    {
+      "id": 12,
+      "lugar": "Impuesto territorial",
+      "categoria": "impuestos",
+      "monto": 15000,
+      "fecha": "2026-10-01"
+    },
+    {
+      "lugar": "anonima",
+      "categoria": "comida",
+      "monto": 20000,
+      "fecha": "2026-10-07",
+      "id": 13
+    },
+    {
+      "lugar": "oisjs",
+      "categoria": "educacion",
+      "monto": 5241,
+      "fecha": "2026-10-06",
+      "id": 14
+    },
+    {
+      "lugar": "anonima",
+      "categoria": "comida",
+      "monto": 50000,
+      "fecha": "2026-10-07",
+      "id": 15
+    },
+    {
+      "lugar": "add",
+      "categoria": "transporte",
+      "monto": 7411,
+      "fecha": "2026-10-07",
+      "id": 16
+    },
+    {
+      "lugar": "vazco",
+      "categoria": "vestimenta",
+      "monto": 10000,
+      "fecha": "2026-10-06",
+      "id": 17
+    },
+    {
+      "lugar": "Cope",
+      "categoria": "comida",
+      "monto": 10000,
+      "fecha": "2026-10-08",
+      "id": 18
+    }
+  ]
+}
