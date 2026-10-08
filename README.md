@@ -67,3 +67,4 @@ Orden de providers:
 - `StatusBar` → fondo oscuro → íconos claros, y viceversa.
 
 
+# gastos-app-sdk54
