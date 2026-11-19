@@ -6,7 +6,7 @@ Mock REST para desarrollo de la app de gastos. Los datos persisten en `db.json`.
 
 ```bash
 npm install
-npm run dev      # http://127.0.0.1:3001
+npm run dev      # http://localhost:3002 (escucha en 0.0.0.0)
 ```
 
 ## Endpoints
@@ -35,10 +35,18 @@ Ejemplo de gasto:
 
 ## Configuración desde la app
 
-La app lee la variable de entorno `EXPO_PUBLIC_API_URL` (ver `../.env.example`).
-Si no está definida, usa por defecto:
+La app lee la URL base del servidor desde la variable `EXPO_PUBLIC_API_URL` (ver `../.env.example`).
+No incluyas `/gastos` al final: la app lo agrega automáticamente.
 
-- Android emulador: `http://10.0.2.2:3001`
-- iOS / web / dispositivo físico: `http://localhost:3001`
+```bash
+# Desde la raíz del proyecto
+cp .env.example .env
+```
 
-Para dispositivo físico, define `EXPO_PUBLIC_API_URL=http://<IP-de-tu-PC>:3001`.
+Ejemplos de valor:
+
+- Android emulador: `http://10.0.2.2:3002`
+- iOS / web: `http://localhost:3002`
+- Dispositivo físico: `http://<IP-de-tu-PC>:3002`
+
+Si la variable no está definida, la app muestra un error al iniciar. El servidor escucha en `0.0.0.0`, así que también es accesible desde la red local.

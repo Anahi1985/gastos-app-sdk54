@@ -19,6 +19,17 @@ export function formatFecha(fecha: string): string {
   return date.toLocaleDateString('es-CL', { day: '2-digit', month: 'short' });
 }
 
+export function esFechaISOValida(valor: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(valor)) return false;
+  const [year, month, day] = valor.split('-').map(Number);
+  const date = new Date(year, month - 1, day);
+  return (
+    date.getFullYear() === year &&
+    date.getMonth() === month - 1 &&
+    date.getDate() === day
+  );
+}
+
 export function hoyISO(): string {
   const now = new Date();
   const month = String(now.getMonth() + 1).padStart(2, '0');

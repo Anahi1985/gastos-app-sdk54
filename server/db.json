@@ -30,101 +30,115 @@
     },
     {
       "id": 5,
-      "lugar": "Verdulería",
-      "categoria": "comida",
-      "monto": 3200,
-      "fecha": "2026-10-04"
-    },
-    {
-      "id": 6,
       "lugar": "Librería",
       "categoria": "educacion",
       "monto": 1800,
       "fecha": "2026-10-03"
     },
     {
-      "id": 7,
-      "lugar": "Carnicería",
+      "lugar": "anonima",
       "categoria": "comida",
-      "monto": 8500,
-      "fecha": "2026-10-03"
+      "monto": 300000,
+      "fecha": "2026-10-28",
+      "comprobanteUri": "file:///data/user/0/host.exp.exponent/files/comprobantes/comprobante-1793303804267.jpg",
+      "id": 6
     },
     {
-      "id": 8,
-      "lugar": "Almacén",
-      "categoria": "comida",
-      "monto": 1200,
-      "fecha": "2026-10-02"
+      "lugar": "op",
+      "categoria": "transporte",
+      "monto": 20000,
+      "fecha": "2026-10-29",
+      "comprobanteUri": "file:///data/user/0/host.exp.exponent/files/comprobantes/comprobante-1793303849899.jpg",
+      "id": 7
     },
     {
-      "id": 9,
-      "lugar": "Panadería",
-      "categoria": "comida",
-      "monto": 2100,
-      "fecha": "2026-10-02"
-    },
-    {
-      "id": 10,
-      "lugar": "Veterinaria",
-      "categoria": "mascotas",
-      "monto": 9500,
-      "fecha": "2026-10-01"
-    },
-    {
-      "id": 11,
-      "lugar": "Cine",
-      "categoria": "entretenimiento",
-      "monto": 7000,
-      "fecha": "2026-10-01"
-    },
-    {
-      "id": 12,
-      "lugar": "Impuesto territorial",
-      "categoria": "impuestos",
-      "monto": 15000,
-      "fecha": "2026-10-01"
+      "lugar": "Hospital",
+      "categoria": "salud",
+      "monto": 25000,
+      "fecha": "2026-10-29",
+      "comprobanteUri": "file:///data/user/0/host.exp.exponent/files/comprobantes/comprobante-1793304560813.jpg",
+      "id": 8
     },
     {
       "lugar": "anonima",
       "categoria": "comida",
-      "monto": 20000,
-      "fecha": "2026-10-07",
+      "monto": 2000,
+      "fecha": "2026-11-05",
+      "comprobanteUri": "file:///data/user/0/host.exp.exponent/files/comprobantes/comprobante-1793910405593.jpg",
+      "id": 9
+    },
+    {
+      "lugar": "coope",
+      "categoria": "hogar",
+      "monto": 62200,
+      "fecha": "2026-11-05",
+      "id": 10
+    },
+    {
+      "lugar": "tito",
+      "categoria": "vestimenta",
+      "monto": 3000,
+      "fecha": "2026-11-04",
+      "id": 11
+    },
+    {
+      "lugar": "Fd",
+      "categoria": "vestimenta",
+      "monto": 5000,
+      "fecha": "2026-11-05",
+      "comprobanteUri": "file:///data/user/0/host.exp.exponent/files/comprobantes/comprobante-1793911826843.jpg",
+      "id": 12
+    },
+    {
+      "lugar": "Feti",
+      "categoria": "salud",
+      "monto": 60,
+      "fecha": "2026-11-01",
       "id": 13
     },
     {
-      "lugar": "oisjs",
-      "categoria": "educacion",
-      "monto": 5241,
-      "fecha": "2026-10-06",
+      "lugar": "anonima",
+      "categoria": "transporte",
+      "monto": 6000,
+      "fecha": "2026-11-06",
       "id": 14
     },
     {
-      "lugar": "anonima",
-      "categoria": "comida",
-      "monto": 50000,
-      "fecha": "2026-10-07",
+      "lugar": "ad",
+      "categoria": "entretenimiento",
+      "monto": 2000,
+      "fecha": "2026-11-06",
+      "comprobanteUri": "file:///data/user/0/host.exp.exponent/files/comprobantes/comprobante-1793964731125.jpg",
       "id": 15
     },
     {
-      "lugar": "add",
-      "categoria": "transporte",
-      "monto": 7411,
-      "fecha": "2026-10-07",
+      "lugar": "Anonima",
+      "categoria": "mascotas",
+      "monto": 70000,
+      "fecha": "2026-11-05",
+      "comprobanteUri": "file:///data/user/0/host.exp.exponent/files/comprobantes/comprobante-1793965470735.jpg",
       "id": 16
     },
     {
-      "lugar": "vazco",
-      "categoria": "vestimenta",
-      "monto": 10000,
-      "fecha": "2026-10-06",
+      "lugar": "yaguar",
+      "categoria": "hogar",
+      "monto": 20000,
+      "fecha": "2026-11-06",
       "id": 17
     },
     {
-      "lugar": "Cope",
+      "lugar": "Anonima",
       "categoria": "comida",
-      "monto": 10000,
-      "fecha": "2026-10-08",
+      "monto": 80000,
+      "fecha": "2026-11-10",
       "id": 18
+    },
+    {
+      "lugar": "ade",
+      "categoria": "hogar",
+      "monto": 92000,
+      "fecha": "2026-11-10",
+      "id": 19
     }
   ]
 }

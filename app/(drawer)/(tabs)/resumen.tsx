@@ -1,24 +1,16 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback, useMemo, useState } from "react";
-import {
-  ActivityIndicator,
-  Button,
-  FlatList,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
-import { IconButton, ProgressBar } from "react-native-paper";
+import { ActivityIndicator, Button, StyleSheet, View } from "react-native";
+import { IconButton, ProgressBar, Text } from "react-native-paper";
+import Animated, { FadeInDown, LinearTransition } from "react-native-reanimated";
 
+import ScreenWrapper from "@/components/ScreenWrapper";
 import { getCategoria } from "@/constants/categories";
 import { formatMonto } from "@/constants/format";
 import { useTheme } from "@/context/ThemeContext";
 import { useGetGastos } from "@/hooks/use-gastos";
-
-import ScreenAppBar from "../components/ScreenAppBar";
-import ScreenWrapper from "../components/ScreenWrapper";
-import sharedStyles from "../styles/sharedStyles";
+import sharedStyles from "@/styles/sharedStyles";
 
 interface TotalPorCategoria {
   id: string;
@@ -30,7 +22,7 @@ function mesActual(): { year: number; month: number } {
   return { year: now.getFullYear(), month: now.getMonth() + 1 };
 }
 
-export default function ResumenScreen({ navigation }: any) {
+export default function ResumenScreen() {
   const { colors } = useTheme();
   const { gastos, loading, error, getGastos } = useGetGastos();
   const [mes, setMes] = useState(mesActual());
@@ -110,7 +102,6 @@ export default function ResumenScreen({ navigation }: any) {
 
   return (
     <View style={[sharedStyles.screen, { backgroundColor: colors.background }]}>
-      <ScreenAppBar title="Resumen" navigation={navigation} />
       <ScreenWrapper>
         <View style={styles.mesNav}>
           <IconButton
@@ -119,7 +110,7 @@ export default function ResumenScreen({ navigation }: any) {
             disabled={!puedeAnterior}
             onPress={() => cambiarMes(-1)}
           />
-          <Text style={[styles.mesTexto, { color: colors.text }]}>{nombreMes(mes)}</Text>
+          <Text style={styles.mesTexto}>{nombreMes(mes)}</Text>
           <IconButton
             icon="chevron-right"
             iconColor={puedeSiguiente ? colors.primary : colors.textDisabled}
@@ -135,39 +126,39 @@ export default function ResumenScreen({ navigation }: any) {
           </Text>
         </Text>
 
-        <FlatList
+        <Animated.FlatList
+          itemLayoutAnimation={LinearTransition}
           data={porCategoria}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.lista}
-          renderItem={({ item }) => {
+          renderItem={({ item, index }) => {
             const categoria = getCategoria(item.id);
             const pct = totalMes > 0 ? (item.total / totalMes) * 100 : 0;
             return (
-              <View style={[styles.fila, { borderBottomColor: colors.border }]}>
+              <Animated.View
+                entering={FadeInDown.delay(Math.min(index, 8) * 70).springify()}
+                style={[styles.fila, { borderBottomColor: colors.border }]}
+              >
                 <View style={styles.filaEncabezado}>
                   <View style={styles.filaTitulo}>
                     <View style={[styles.icono, { backgroundColor: categoria.color }]}>
                       <Ionicons name={categoria.icono} size={18} color={colors.onPrimary} />
                     </View>
                     <View style={styles.filaTexto}>
-                      <Text style={[styles.categoriaNombre, { color: colors.text }]}>
-                        {categoria.nombre}
-                      </Text>
+                      <Text style={styles.categoriaNombre}>{categoria.nombre}</Text>
                       <Text style={[styles.categoriaTotal, { color: colors.textSecondary }]}>
                         {formatMonto(item.total)}
                       </Text>
                     </View>
                   </View>
-                  <Text style={[styles.categoriaPct, { color: colors.text }]}>
-                    {pct.toFixed(0)}%
-                  </Text>
+                  <Text style={styles.categoriaPct}>{pct.toFixed(0)}%</Text>
                 </View>
                 <ProgressBar
                   progress={pct / 100}
                   color={categoria.color}
                   style={styles.barra}
                 />
-              </View>
+              </Animated.View>
             );
           }}
           refreshing={loading}

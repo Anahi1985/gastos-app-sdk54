@@ -1,5 +1,6 @@
 import { Colors, darkColors, lightColors } from "@/constants/theme";
-import { createContext, ReactNode, useCallback, useContext, useMemo, useState } from "react";
+import { useStoredState } from "@/hooks/useStoredState";
+import { createContext, ReactNode, useCallback, useContext, useMemo } from "react";
 
 export type Theme = "light" | "dark";
 
@@ -13,12 +14,13 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("light");
+  const [storedTheme, setStoredTheme] = useStoredState<Theme>("@gastos:theme", "light");
+  const theme: Theme = storedTheme === "dark" ? "dark" : "light";
 
   // useCallback : toggleTheme mantiene la misma identidad entre renders.
   const toggleTheme = useCallback(() => {
-    setTheme((prev) => (prev === "light" ? "dark" : "light"));
-  }, []);
+    setStoredTheme((prev) => (prev === "light" ? "dark" : "light"));
+  }, [setStoredTheme]);
 
   // useMemo : sin esto, "value" es un objeto nuevo en cada render del Provider
   // y TODOS los consumidores se re-renderizan aunque el tema no haya cambiado.

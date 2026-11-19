@@ -1,12 +1,19 @@
 import React from "react";
-import { ScrollView, Text, View } from "react-native";
+import { ScrollView, View } from "react-native";
+import { Text } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useTheme } from "@/context/ThemeContext";
 
-import sharedStyles from "../styles/sharedStyles";
+import sharedStyles from "@/styles/sharedStyles";
 
-function ScreenWrapper({ children, title, withScroll = false }: any) {
+interface ScreenWrapperProps {
+  children: React.ReactNode;
+  title?: string;
+  withScroll?: boolean;
+}
+
+function ScreenWrapper({ children, title, withScroll = false }: ScreenWrapperProps) {
   const { colors } = useTheme();
   const Container = withScroll ? ScrollView : View;
 
@@ -16,7 +23,7 @@ function ScreenWrapper({ children, title, withScroll = false }: any) {
       edges={["bottom", "left", "right"]}
     >
       <Container style={sharedStyles.content}>
-        {title && <Text style={[sharedStyles.title, { color: colors.text }]}>{title}</Text>}
+        {title && <Text style={sharedStyles.title}>{title}</Text>}
         {children}
       </Container>
     </SafeAreaView>

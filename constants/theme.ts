@@ -22,14 +22,23 @@ export const lightColors = {
   error: "#EF4444",
   onError: "#FFFFFF",
 
+  // Overlay de cámara (mismos colores en ambos temas)
+  cameraBackground: "#000000",
+  cameraOverlay: "rgba(0,0,0,0.5)",
+  cameraOnOverlay: "#FFFFFF",
+
   // Bordes e inputs
   border: "#D1D5DB",
   inputBackground: "#FFFFFF",
   inputBorder: "#C7D2FE",       // Borde con toque púrpura en inputs
   inputText: "#1E1B4B",
+  shadow: "#000000",
 
   // Barra de pestañas
   tabBarInactive: "#8B5CF6",
+
+  // Menú lateral
+  drawerOverlay: "rgba(0,0,0,0.4)",
 };
 
 
@@ -56,14 +65,23 @@ export const darkColors: Colors = {
   error: "#F87171",
   onError: "#0F0C1B",
 
+  // Overlay de cámara (mismos colores en ambos temas)
+  cameraBackground: "#000000",
+  cameraOverlay: "rgba(0,0,0,0.5)",
+  cameraOnOverlay: "#FFFFFF",
+
   // Bordes e inputs
   border: "#3730A3",
   inputBackground: "#1D1933",
   inputBorder: "#4C1D95",
   inputText: "#F9FAFB",
+  shadow: "#000000",
 
   // Barra de pestañas
   tabBarInactive: "#6B7280",
+
+  // Menú lateral
+  drawerOverlay: "rgba(0,0,0,0.7)",
 };
 
 export const spacing = { xs: 4, sm: 8, md: 16, lg: 24, xl: 32 };
