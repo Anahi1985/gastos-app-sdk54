@@ -1,26 +1,20 @@
 # Gastos App — SDK 54 · Navegación y animaciones (Clase 10)
 
-Aplicación de registro de gastos en **Expo SDK 54 / React Native** con **Drawer + Tabs**, **tema global claro/oscuro persistido**, una **paleta de marca centralizada** y animaciones con Reanimated.
+Aplicación de registro de gastos en **Expo SDK 54 / React Native** con **Drawer + Tabs**, **tema global claro/oscuro persistido**, una **paleta de marca centralizada**, animaciones con Reanimated y persistencia en **Cloud Firestore**.
 
 ## Cómo correr
 
 Requisitos: Node.js, npm y, para Android, un emulador o dispositivo con la app **Expo Go**.
 
 ```bash
-# 1. Dependencias de la app (desde la raíz)
+# 1. Dependencias (desde la raíz)
 npm install
 
-# 2. Servidor API (en otra terminal)
-cd server
-npm install
-npm run dev
-# Queda en http://localhost:3002 y escucha en 0.0.0.0
-
-# 3. Configurar la URL de la API (desde la raíz)
+# 2. Configurar Firebase
 cp .env.example .env
-# Editá .env según dónde corras la app
+# Editá .env con la config web de tu proyecto Firebase
 
-# 4. App (en otra terminal, desde la raíz)
+# 3. App
 npm start
 # o directamente:
 npm run android
@@ -28,22 +22,49 @@ npm run ios
 npm run web
 ```
 
-La app toma la URL base de `EXPO_PUBLIC_API_URL` definida en `.env`. No incluyas `/gastos` al final: la app lo agrega automáticamente.
+Si cambiás las variables de Firebase, reiniciá Metro con caché limpia:
 
-```env
-# Android emulador
-EXPO_PUBLIC_API_URL=http://10.0.2.2:3002
-
-# iOS / web
-EXPO_PUBLIC_API_URL=http://localhost:3002
-
-# Dispositivo físico en la misma red que la PC
-EXPO_PUBLIC_API_URL=http://192.168.1.100:3002
+```bash
+npx expo start -c
 ```
 
-Si la variable no está definida, la app muestra un error al iniciar. El archivo `.env` es local y está ignorado por Git.
+## Configurar Firebase
 
-El servidor guarda los datos en `server/db.json`. Podés reiniciarlo con `Ctrl+C` y volver a ejecutar `npm run dev`.
+1. En Firebase Console, abrir el proyecto `gastos-app-sdk54`.
+2. Crear **Firestore Database** en modo **test** y elegir una región.
+3. En **Project settings → Your apps**, registrar una app **Web** y copiar el objeto `firebaseConfig`.
+4. Completar `.env` con esos valores:
+
+```env
+EXPO_PUBLIC_FIREBASE_API_KEY=...
+EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=gastos-app-sdk54.firebaseapp.com
+EXPO_PUBLIC_FIREBASE_PROJECT_ID=gastos-app-sdk54
+EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=gastos-app-sdk54.firebasestorage.app
+EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=...
+EXPO_PUBLIC_FIREBASE_APP_ID=...
+```
+
+El archivo `.env` es local y está ignorado por Git.
+
+La instancia de Firestore se inicializa en `app/config/firebase.ts` con `useFetchStreams: false`, `experimentalForceLongPolling: true` y `experimentalAutoDetectLongPolling: false`. React Native no soporta completamente los fetch streams del build web de Firebase y el transporte WebChannel puede fallar en el emulador; con long polling forzado Firestore usa requests HTTP comunes en vez de streams persistentes.
+
+Los gastos se guardan en la colección `gastos` de Firestore:
+
+```json
+{
+  "lugar": "Supermercado",
+  "categoria": "comida",
+  "monto": 12500,
+  "fecha": "2026-11-20",
+  "comprobanteUri": "file:///.../comprobante-....jpg"
+}
+```
+
+El `id` del gasto es el `id` del documento de Firestore. El modo test deja lecturas y escrituras abiertas solo para desarrollo; configura reglas reales antes de publicar.
+
+Los comprobantes siguen siendo archivos locales del dispositivo. Por eso, al abrir un gasto creado en otro dispositivo, se muestra el placeholder “Comprobante no disponible en este dispositivo”.
+
+El directorio `server/` queda como referencia del anterior API REST local, pero la app ya no lo usa.
 
 ## Capturas
 
@@ -61,8 +82,9 @@ Capturas tomadas desde el emulador Android (`assets/screenshots/`).
 
 - **Menú lateral (Drawer)** con “Inicio”, “Estadísticas” y “Ajustes”, y **pestañas (Tabs)** para Gastos y Resumen.
 - **Estadísticas por categoría** con selector de período “Todo”/“Mes” y gráfico de barras horizontales.
-- Navegación anidada **Stack ⊃ Drawer ⊃ Tabs** con `expo-router` y headers nativos.
-- **Detalle** y **Nuevo gasto** apilados sobre el Drawer. `Nuevo gasto` se presenta como modal en iOS y como pantalla `card` en Android para respetar el área segura con edge-to-edge.
+- Navegación anidada **Stack ⊃ Drawer ⊃ Tabs** con `expo-router`.
+- **Detalle** y **Nuevo gasto** apilados sobre el Drawer, con header propio respetuoso del área segura.
+- **Persistencia en Firestore**: lectura y escritura de gastos desde hooks, sin servidor local.
 - **Animaciones** de entrada en cascada, reacomodo de listas y transición `fade` entre pestañas.
 - Tema claro/oscuro global controlado por un `ThemeProvider` propio y **persistido con AsyncStorage**.
 - **Paleta centralizada**: todos los `#` de color viven en `constants/theme.ts`.

@@ -1,10 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { Image } from "expo-image";
 import { StyleSheet, View } from "react-native";
 import { Button, Card, Divider, Text } from "react-native-paper";
 import Animated, { FadeInDown, ZoomIn } from "react-native-reanimated";
 
+import ComprobanteImage from "@/components/ComprobanteImage";
 import ScreenWrapper from "@/components/ScreenWrapper";
 import StackHeader from "@/components/StackHeader";
 import { Gasto } from "@/constants/api";
@@ -86,12 +86,7 @@ export default function DetalleContenido() {
             <Card style={[styles.comprobanteCard, { backgroundColor: colors.card }]}>
               <Card.Title title="Comprobante" />
               <Card.Content>
-                <Image
-                  source={{ uri: gasto.comprobanteUri }}
-                  style={styles.comprobanteImagen}
-                  contentFit="contain"
-                  transition={200}
-                />
+                <ComprobanteImage uri={gasto.comprobanteUri} height={320} />
               </Card.Content>
             </Card>
           </Animated.View>
@@ -126,7 +121,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   comprobanteCard: { marginTop: 16 },
-  comprobanteImagen: { width: "100%", height: 320, borderRadius: 8 },
   lugar: { fontSize: 22, fontWeight: "bold" },
   monto: { fontSize: 32, fontWeight: "bold", marginTop: 8 },
   card: {

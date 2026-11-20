@@ -1,6 +1,8 @@
-# API local (json-server)
+# API local (json-server) — legacy
 
-Mock REST para desarrollo de la app de gastos. Los datos persisten en `db.json`.
+Mock REST que se usó antes de migrar la app a **Cloud Firestore**. Los datos persisten en `db.json`.
+
+> La app actual ya no consume este servidor. La lógica activa está en `hooks/use-gastos.tsx`, `hooks/use-post-gasto.tsx` y `app/config/firebase.ts`. Este directorio se conserva solo como referencia de la API anterior.
 
 ## Uso
 
@@ -35,18 +37,4 @@ Ejemplo de gasto:
 
 ## Configuración desde la app
 
-La app lee la URL base del servidor desde la variable `EXPO_PUBLIC_API_URL` (ver `../.env.example`).
-No incluyas `/gastos` al final: la app lo agrega automáticamente.
-
-```bash
-# Desde la raíz del proyecto
-cp .env.example .env
-```
-
-Ejemplos de valor:
-
-- Android emulador: `http://10.0.2.2:3002`
-- iOS / web: `http://localhost:3002`
-- Dispositivo físico: `http://<IP-de-tu-PC>:3002`
-
-Si la variable no está definida, la app muestra un error al iniciar. El servidor escucha en `0.0.0.0`, así que también es accesible desde la red local.
+La versión anterior leía la URL base del servidor desde `EXPO_PUBLIC_API_URL`. Esa variable ya no se usa; la configuración activa son las variables `EXPO_PUBLIC_FIREBASE_*` documentadas en `../.env.example`.

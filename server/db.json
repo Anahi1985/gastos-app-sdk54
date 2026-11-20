@@ -139,6 +139,46 @@
       "monto": 92000,
       "fecha": "2026-11-10",
       "id": 19
+    },
+    {
+      "lugar": "Anonima",
+      "categoria": "comida",
+      "monto": 300000,
+      "fecha": "2026-11-20",
+      "comprobanteUri": "file:///data/user/0/host.exp.exponent/files/comprobantes/comprobante-1795181452218.jpg",
+      "id": 20
+    },
+    {
+      "lugar": "Coope",
+      "categoria": "hogar",
+      "monto": 6800,
+      "fecha": "2026-11-20",
+      "comprobanteUri": "file:///data/user/0/host.exp.exponent/files/comprobantes/comprobante-1795181493572.jpeg",
+      "id": 21
+    },
+    {
+      "lugar": "Esc",
+      "categoria": "educacion",
+      "monto": 9000,
+      "fecha": "2026-11-18",
+      "comprobanteUri": "file:///data/user/0/host.exp.exponent/files/comprobantes/comprobante-1795181541966.jpg",
+      "id": 22
+    },
+    {
+      "lugar": "Gas",
+      "categoria": "impuestos",
+      "monto": 28000,
+      "fecha": "2026-11-20",
+      "comprobanteUri": "file:///data/user/0/host.exp.exponent/files/comprobantes/comprobante-1795181720746.jpeg",
+      "id": 23
+    },
+    {
+      "lugar": "AD",
+      "categoria": "entretenimiento",
+      "monto": 1000,
+      "fecha": "2026-11-20",
+      "comprobanteUri": "file:///data/user/0/host.exp.exponent/files/comprobantes/comprobante-1795184446974.jpg",
+      "id": 24
     }
   ]
 }

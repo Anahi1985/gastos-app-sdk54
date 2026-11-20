@@ -30,7 +30,8 @@
         "android.permission.READ_MEDIA_IMAGES",
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.RECORD_AUDIO"
-      ]
+      ],
+      "package": "com.nanhy.gastosappsdk54"
     },
     "web": {
       "output": "static",

@@ -1,6 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
 import { CameraType, CameraView, useCameraPermissions } from "expo-camera";
-import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -14,6 +13,7 @@ import {
 } from "react-native";
 import { Button, Card, IconButton, Text } from "react-native-paper";
 
+import ComprobanteImage from "@/components/ComprobanteImage";
 import { useTheme } from "@/context/ThemeContext";
 
 interface ComprobanteAdjuntoProps {
@@ -126,12 +126,7 @@ export default function ComprobanteAdjunto({ uri, onChange }: ComprobanteAdjunto
       {uri && (
         <Card style={[styles.card, { backgroundColor: colors.card }]}>
           <Card.Content style={styles.contenido}>
-            <Image
-              source={{ uri }}
-              style={styles.imagen}
-              contentFit="contain"
-              transition={200}
-            />
+            <ComprobanteImage uri={uri} height={240} />
           </Card.Content>
           <Card.Actions style={styles.acciones}>
             <IconButton
@@ -218,7 +213,6 @@ const styles = StyleSheet.create({
   boton: { flex: 1 },
   card: { marginTop: 12 },
   contenido: { alignItems: "center" },
-  imagen: { width: "100%", height: 240, borderRadius: 8 },
   acciones: { justifyContent: "flex-end" },
   permisoContainer: {
     flex: 1,

@@ -10,7 +10,7 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "test": "jest",
-    "test:watch":"jest --watcAll"
+    "test:watch": "jest --watcAll"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
@@ -36,6 +36,7 @@
     "expo-symbols": "~1.0.8",
     "expo-system-ui": "~6.0.9",
     "expo-web-browser": "~15.0.11",
+    "firebase": "^13.4.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-native": "0.81.5",
@@ -59,11 +60,10 @@
     "typescript": "~5.9.2"
   },
   "private": true,
-  "jest":{
-    "preset":"jest-expo",
-    "moduleNaameMapper":{
-      "^@/(.*)$":"<rootDir>/$1"
+  "jest": {
+    "preset": "jest-expo",
+    "moduleNaameMapper": {
+      "^@/(.*)$": "<rootDir>/$1"
     }
   }
-
 }

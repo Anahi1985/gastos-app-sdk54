@@ -60,7 +60,7 @@ export default function GastosScreen() {
       : porCategoria;
     return [...porBusqueda].sort((a, b) => {
       const porFecha = b.fecha.localeCompare(a.fecha);
-      return porFecha !== 0 ? porFecha : b.id - a.id;
+      return porFecha !== 0 ? porFecha : b.id.localeCompare(a.id);
     });
   }, [gastos, categoria, search]);
 
@@ -200,7 +200,7 @@ export default function GastosScreen() {
         <Animated.FlatList
           itemLayoutAnimation={LinearTransition}
           data={filtrados}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item.id}
           renderItem={({ item, index }) => (
             <GastoItem gasto={item} index={index} onPress={handleOpenDetalle} />
           )}
