@@ -1,4 +1,4 @@
-# Gastos App — SDK 54 · Proyecto final (Clases 10–13)
+# Gastos App — SDK 54 · Proyecto final
 
 Aplicación de registro de gastos en **Expo SDK 54 / React Native** con **Drawer + Tabs**, **tema global claro/oscuro persistido**, una **paleta de marca centralizada**, animaciones con Reanimated, persistencia en **Cloud Firestore**, diálogos compatibles con web y builds Android `.apk` con **EAS Build**.
 
@@ -94,7 +94,7 @@ El build anterior (`e5116311-44e5-4ee0-81c2-4e1a83875a35`) no incluye los fixes 
 
 ## Capturas
 
-Capturas tomadas desde el emulador Android (`assets/screenshots/`).
+Capturas de la app desde el emulador Android y del proyecto en Firebase Console (`assets/screenshots/`).
 
 | Gastos | Detalle | Nuevo gasto |
 | --- | --- | --- |
@@ -103,6 +103,14 @@ Capturas tomadas desde el emulador Android (`assets/screenshots/`).
 | Resumen mensual | Comprobante adjunto |
 | --- | --- |
 | ![Resumen](assets/screenshots/04-resumen.png) | ![Comprobante](assets/screenshots/05-comprobante.png) |
+
+### Firebase
+
+| Colección `gastos` en Firestore | Configuración web de Firebase |
+| --- | --- |
+| ![Colección gastos en Firestore](assets/screenshots/06-firestore.png) | ![Configuración web de Firebase](assets/screenshots/07-firebase-config.png) |
+
+Los documentos se guardan en la colección `gastos` de la base `(default)`; los valores de `firebaseConfig` se cargan desde `.env` mediante variables `EXPO_PUBLIC_FIREBASE_*`.
 
 ## Qué se aplicó en el proyecto
 
