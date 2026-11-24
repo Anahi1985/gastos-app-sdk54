@@ -75,7 +75,7 @@ Estas funcionalidades quedan fuera del alcance actual del TIF y son líneas natu
 - **Ingresos mensuales y balance:** registrar un ingreso base o múltiples ingresos por mes para calcular el saldo disponible frente al total de gastos del período.
 - **Presupuestos por categoría y alertas:** configurar topes mensuales por categoría (Comida, Transporte, Salud, etc.) y mostrar avisos preventivos al alcanzar o superar el umbral.
 - **Autenticación y aislamiento por usuario:** integrar Firebase Authentication y asociar los documentos de Firestore a un `userId`, con reglas de seguridad por usuario.
-- **Comprobantes en la nube:** migrar `comprobanteUri` desde almacenamiento local a Firebase Storage para acceder a las imágenes desde cualquier dispositivo.
+- **Comprobantes en la nube:** actualmente la app almacena únicamente la referencia local del archivo en el dispositivo (comprobanteUri), por lo que la imagen no se sube ni se visualiza desde otros equipos. Como mejora futura, se plantea integrar Firebase Storage para subir el archivo binario y guardar su URL pública/descargable en Firestore, permitiendo consultar los comprobantes desde cualquier dispositivo.
 - **Consultas y modo offline:** agregar paginación y caché local sincronizada para sostener el rendimiento con historiales grandes.
 
 ---
