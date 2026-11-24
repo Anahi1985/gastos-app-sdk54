@@ -78,4 +78,4 @@ Stack
 - [x] Tengo escrito **lo que NO hace**.
 - [x] Es algo que puedo **terminar y probar** antes de la Clase 14.
 - [x] Tengo un **plan B** si falla una parte (Internet, Firebase, web).
-- [ ] Falta la validación en vivo con un celular/emulador conectado.
+- [x] Validación en vivo realizada en celular.
