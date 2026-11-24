@@ -1,29 +1,24 @@
 import { useCallback, useState } from "react";
 
-import { addDoc, collection } from "firebase/firestore";
+import { createGasto, type CreateGastoData } from "@/constants/api";
 
-import { db } from "@/config/firebase";
-import { CreateGastoData } from "@/constants/api";
+type SaveGastoResult = { ok: boolean; error?: string };
 
+/** Hook que crea un gasto en Firestore y expone su estado de guardado. */
 export function usePostGasto() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const saveGasto = useCallback(async (gastoData: CreateGastoData) => {
+  const saveGasto = useCallback(async (gastoData: CreateGastoData): Promise<SaveGastoResult> => {
     setLoading(true);
     setError(null);
     try {
-      if (!db) {
-        throw new Error(
-          "Firebase no está configurado. Revisá las variables EXPO_PUBLIC_FIREBASE_* en .env."
-        );
-      }
-
-      await addDoc(collection(db, "gastos"), gastoData);
-      return true;
+      await createGasto(gastoData);
+      return { ok: true };
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Error al guardar el gasto");
-      return false;
+      const mensaje = e instanceof Error ? e.message : "Error al guardar el gasto";
+      setError(mensaje);
+      return { ok: false, error: mensaje };
     } finally {
       setLoading(false);
     }

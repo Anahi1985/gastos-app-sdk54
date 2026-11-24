@@ -1,6 +1,6 @@
-# Gastos App — SDK 54 · Navegación y animaciones (Clase 10)
+# Gastos App — SDK 54 · Proyecto final (Clases 10–13)
 
-Aplicación de registro de gastos en **Expo SDK 54 / React Native** con **Drawer + Tabs**, **tema global claro/oscuro persistido**, una **paleta de marca centralizada**, animaciones con Reanimated y persistencia en **Cloud Firestore**.
+Aplicación de registro de gastos en **Expo SDK 54 / React Native** con **Drawer + Tabs**, **tema global claro/oscuro persistido**, una **paleta de marca centralizada**, animaciones con Reanimated, persistencia en **Cloud Firestore**, diálogos compatibles con web y builds Android `.apk` con **EAS Build**.
 
 ## Cómo correr
 
@@ -64,7 +64,33 @@ El `id` del gasto es el `id` del documento de Firestore. El modo test deja lectu
 
 Los comprobantes siguen siendo archivos locales del dispositivo. Por eso, al abrir un gasto creado en otro dispositivo, se muestra el placeholder “Comprobante no disponible en este dispositivo”.
 
-El directorio `server/` queda como referencia del anterior API REST local, pero la app ya no lo usa.
+El anterior API REST local fue eliminado: la app ya no depende de servidor propio, IPs locales ni variables de URL base.
+
+## Comportamiento web y guardado
+
+En web, `react-native-web` no implementa `Alert.alert` y `DateTimePicker` no está disponible. Por eso:
+
+- La confirmación de borrado, los errores de permisos/cámara/galería, las validaciones y el resultado del alta usan `Dialog` + `Portal` de `react-native-paper`. Si Firestore falla, se muestra el mensaje real y se puede reintentar.
+- La fecha se escribe como `DD-MM-AAAA` (acepta `-` o `/`) y se convierte a ISO `YYYY-MM-DD` antes de guardar en Firestore. En Android/iOS se mantiene `DateTimePicker`.
+- Después de guardar **no se vuelve automáticamente** al listado: aparece “¡Éxito!” y el botón “Volver” ejecuta `router.back()`.
+- Los hooks `use-post-gasto.tsx` y `use-delete-gasto.tsx` devuelven `{ ok, error }`, y `use-gastos.tsx` expone `getGastos` para reintentar la carga.
+
+## Build / APK con EAS
+
+El proyecto está asociado a la cuenta `nanhy` (`owner` en `app.json`) y al paquete Android `com.nanhy.gastosappsdk54`. El perfil `preview` de `eas.json` genera un `.apk` instalable (`android.buildType: apk`) con distribución interna.
+
+Antes de buildiar, configurá las variables `EXPO_PUBLIC_FIREBASE_*` en el entorno `preview` de EAS (en el dashboard de Expo o con los comandos `eas env:*`). El archivo `.env` local está ignorado por Git y **no se sube** a EAS Build.
+
+```bash
+npm install -g eas-cli
+eas login
+eas whoami              # debe mostrar la cuenta nanhy
+eas build -p android --profile preview
+```
+
+El artefacto descargable desde el dashboard de EAS es un `.apk` listo para instalar en un teléfono físico o emulador Android.
+
+El build anterior (`e5116311-44e5-4ee0-81c2-4e1a83875a35`) no incluye los fixes de diálogos web, fecha editable ni manejo de errores; queda generar un `.apk` nuevo con este código.
 
 ## Capturas
 
@@ -78,7 +104,7 @@ Capturas tomadas desde el emulador Android (`assets/screenshots/`).
 | --- | --- |
 | ![Resumen](assets/screenshots/04-resumen.png) | ![Comprobante](assets/screenshots/05-comprobante.png) |
 
-## Qué se aplicó en esta clase
+## Qué se aplicó en el proyecto
 
 - **Menú lateral (Drawer)** con “Inicio”, “Estadísticas” y “Ajustes”, y **pestañas (Tabs)** para Gastos y Resumen.
 - **Estadísticas por categoría** con selector de período “Todo”/“Mes” y gráfico de barras horizontales.
@@ -108,6 +134,38 @@ Capturas tomadas desde el emulador Android (`assets/screenshots/`).
 
 Si un componente necesita un color, siempre sale de `useTheme()` (colores de marca) o de `categoryColors` (categoría). Así el tema se mantiene consistente y es fácil de cambiar.
 
+Excepción documentada: `app.json` conserva tres colores literales (`#E6F4FE` en el icono adaptativo y `#ffffff`/`#000000` en el splash). Expo los consume como configuración nativa antes de cargar el código JavaScript, por lo que no pueden importarse desde `constants/theme.ts`. La regla se aplica íntegramente a `.ts`/`.tsx`.
+
+## Desarrollo de temas de la cursada
+
+### Navegación
+
+La navegación se armó con `expo-router` en tres niveles: el `Stack` raíz (`app/_layout.tsx`) apila `crear` y `detalle` sobre el `Drawer` (`app/(drawer)/_layout.tsx`), que contiene `estadisticas` y `ajustes`; dentro de `(tabs)` (`app/(drawer)/(tabs)/_layout.tsx`) viven `Gastos` y `Resumen`. El tipado usa `RootStackParamList` (`constants/navigation.ts`) y `useRoute`/`useNavigation` desde componentes hijos, mientras el listado usa `router.push()`.
+
+### Persistencia
+
+Los gastos se guardan en Cloud Firestore: `app/config/firebase.ts` inicializa la app con long polling, `constants/api.ts` concentra `getGastos`, `createGasto` y `deleteGasto`, y los hooks `use-gastos`, `use-post-gasto` y `use-delete-gasto` exponen estados y resultados a la UI. Las preferencias del dispositivo se guardan con `AsyncStorage` mediante `hooks/useStoredState.ts`. Los comprobantes se copian de la caché a `Paths.document/comprobantes` en `constants/files.ts`.
+
+### Theming y componentes
+
+`constants/theme.ts` define `lightColors`, `darkColors` y `categoryColors`; `getPaperTheme()` traduce esa paleta a roles MD3, incluidos los niveles de `elevation`. `context/ThemeContext.tsx` comparte el tema con `useMemo`/`useCallback` y lo persiste con `AsyncStorage`. La UI usa `Text`, `TextInput`, `Button`, `Dialog` y `Portal` de React Native Paper, por lo que hereda el tema sin pintar colores a mano; los únicos hex fuera de `theme.ts` son la excepción nativa de `app.json`.
+
+### Componentes nativos y comprobantes
+
+`components/ComprobanteAdjunto.tsx` usa `expo-camera` y `expo-image-picker`, pide permisos, reacciona a `AppState` al volver de Ajustes y ofrece `Linking.openSettings()` cuando `canAskAgain` es falso. La imagen temporal se persiste antes del guardado y se muestra con `ComprobanteImage`. Las confirmaciones y errores usan `Dialog` porque `Alert` no funciona en web.
+
+### Animaciones
+
+Se usan `FadeInDown` con `delay` en listas y formularios, `LinearTransition` para reacomodar filas al filtrar o cambiar de mes y `ZoomIn.springify()` para abrir detalle y ajustes; las Tabs usan transición `fade`.
+
+### Hooks, validación y errores
+
+Los hooks exponen `loading`/`error` y devuelven `{ ok, error }` para que la pantalla decida qué mostrar, sin relanzar excepciones. Antes de guardar se validan lugar, categoría, monto (`Number.isNaN`/`<= 0`) y fecha (`esFechaISOValida`); en web, `DD-MM-AAAA` se convierte a ISO. Los `catch` usan `e instanceof Error` con mensaje fallback.
+
+### Build y QA
+
+El perfil `preview` de `eas.json` genera `.apk` con EAS; el repositorio incluye capturas en `assets/screenshots/`, la ficha de alcance en `documentacion/` y los chequeos `npx tsc --noEmit`, `npm run lint` y exports de Expo. La validación en dispositivo físico/emulador queda como paso final de entrega.
+
 ## Mapa de navegación
 
 ```
@@ -127,6 +185,12 @@ Stack raíz (app/_layout.tsx)
 ```
 constants/theme.ts              # Paleta de marca (light/dark), colores de categorías, getPaperTheme()
 constants/navigation.ts         # RootStackParamList y tipos basados en NativeStackScreenProps
+app/config/firebase.ts          # Inicialización de Firebase App y Firestore
+constants/api.ts                # getGastos, createGasto y deleteGasto contra Cloud Firestore
+constants/gastos.ts             # Modelo Gasto y nombre de la colección
+hooks/use-gastos.tsx            # Listado de gastos
+hooks/use-post-gasto.tsx        # Alta de gastos
+hooks/use-delete-gasto.tsx      # Eliminación de gastos
 context/ThemeContext.tsx        # ThemeProvider + hook useTheme()
 hooks/useStoredState.ts         # useState persistido en AsyncStorage
 app/_layout.tsx                 # GestureHandlerRootView + providers + Stack raíz
@@ -135,7 +199,25 @@ app/(drawer)/(tabs)/_layout.tsx # Barra de pestañas
 app/(drawer)/estadisticas.tsx   # Estadísticas por categoría
 components/                     # GastoItem, ScreenWrapper, ComprobanteAdjunto, DetalleContenido, CategoriaBarChart
 styles/sharedStyles.ts          # Espaciados, radios y estilos compartidos
+eas.json                        # Perfil preview con android.buildType: apk
 ```
+
+## Documentación
+
+- [Ficha de alcance — Gastos App](./documentacion/Ficha%20de%20alcance%20-%20Gastos%20App.md)
+
+## Correcciones aplicadas
+
+| Observación | Cómo quedó |
+| :--- | :--- |
+| `db.json`, `10.0.2.2`, `EXPO_PUBLIC_API_URL`, puerto `3000` y `/users` | Servidor eliminado: la app usa Firestore y `.env` solo contiene variables `EXPO_PUBLIC_FIREBASE_*`. |
+| `usePostGasto` y alta | `loading`/`error` + retorno `{ ok, error }`; la pantalla muestra `Dialog`, no `Alert`. |
+| Validación de monto y fecha | `Number.isNaN`/`<= 0` y `esFechaISOValida` antes de guardar; fecha web `DD-MM-AAAA` convertida a ISO. |
+| `err: any` | Ninguno: los `catch` usan `e instanceof Error` con mensaje fallback. |
+| Theming | MD3 con `elevation`, `useMemo`/`useCallback`, regla del color y excepción nativa documentada arriba. |
+| FAB, Paper y orden | FAB con `primary`/`onPrimary`, `Text`/`TextInput` de Paper y copia del array antes de `.sort()`. |
+| Permisos y comprobantes | `AppState` re-lee permisos, `!canAskAgain` abre configuración y la imagen se copia a `documentDirectory`. |
+| README | Instrucciones de ejecución, Firebase, EAS, ficha de alcance y capturas. |
 
 ### `constants/theme.ts`
 
@@ -174,11 +256,15 @@ Orden de providers:
         <StatusBar style={theme === "dark" ? "light" : "dark"} />
         <Stack>
           <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
-          <Stack.Screen name="detalle" options={{ title: "Detalle del gasto" }} />
+          <Stack.Screen
+            name="detalle"
+            options={{ title: "Detalle del gasto", headerShown: false }}
+          />
           <Stack.Screen
             name="crear"
             options={{
               title: "Nuevo gasto",
+              headerShown: false,
               presentation: Platform.OS === "ios" ? "modal" : "card",
               animation: "slide_from_bottom",
             }}

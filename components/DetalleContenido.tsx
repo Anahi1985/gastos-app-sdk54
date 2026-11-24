@@ -1,7 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { useCallback, useState } from "react";
 import { StyleSheet, View } from "react-native";
-import { Button, Card, Divider, Text } from "react-native-paper";
+import { Button, Card, Dialog, Divider, Portal, Text } from "react-native-paper";
 import Animated, { FadeInDown, ZoomIn } from "react-native-reanimated";
 
 import ComprobanteImage from "@/components/ComprobanteImage";
@@ -12,12 +13,17 @@ import { getCategoria } from "@/constants/categories";
 import { formatFecha, formatMonto } from "@/constants/format";
 import type { DetalleNavigationProp, DetalleRouteProp } from "@/constants/navigation";
 import { useTheme } from "@/context/ThemeContext";
+import { useDeleteGasto } from "@/hooks/use-delete-gasto";
 import sharedStyles from "@/styles/sharedStyles";
 
 export default function DetalleContenido() {
   const { colors } = useTheme();
   const route = useRoute<DetalleRouteProp>();
   const navigation = useNavigation<DetalleNavigationProp>();
+  const { deleteGasto, loading: eliminando } = useDeleteGasto();
+  const [confirmarVisible, setConfirmarVisible] = useState(false);
+  const [errorVisible, setErrorVisible] = useState(false);
+  const [mensajeError, setMensajeError] = useState("");
   const gastoParam = route.params?.gasto;
 
   let gasto: Gasto | null = null;
@@ -26,6 +32,24 @@ export default function DetalleContenido() {
   } catch {
     gasto = null;
   }
+
+  const handleEliminar = useCallback(() => {
+    if (gasto) setConfirmarVisible(true);
+  }, [gasto]);
+
+  const handleConfirmarEliminar = useCallback(async () => {
+    if (!gasto) return;
+
+    const resultado = await deleteGasto(gasto.id);
+    setConfirmarVisible(false);
+
+    if (resultado.ok) {
+      navigation.goBack();
+    } else {
+      setMensajeError(resultado.error ?? "No se pudo eliminar el gasto.");
+      setErrorVisible(true);
+    }
+  }, [deleteGasto, gasto, navigation]);
 
   if (!gasto) {
     return (
@@ -101,8 +125,57 @@ export default function DetalleContenido() {
           >
             Agregar otro gasto
           </Button>
+          <Button
+            mode="outlined"
+            icon="delete-outline"
+            textColor={colors.error}
+            onPress={handleEliminar}
+            disabled={eliminando}
+            style={styles.boton}
+          >
+            {eliminando ? "Eliminando..." : "Eliminar gasto"}
+          </Button>
         </Animated.View>
       </ScreenWrapper>
+
+      <Portal>
+        <Dialog
+          visible={confirmarVisible}
+          onDismiss={() => {
+            if (!eliminando) setConfirmarVisible(false);
+          }}
+        >
+          <Dialog.Icon icon="delete-outline" />
+          <Dialog.Title>Eliminar gasto</Dialog.Title>
+          <Dialog.Content>
+            <Text variant="bodyMedium">¿Querés eliminar este gasto de Firestore?</Text>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button disabled={eliminando} onPress={() => setConfirmarVisible(false)}>
+              Cancelar
+            </Button>
+            <Button
+              disabled={eliminando}
+              loading={eliminando}
+              textColor={colors.error}
+              onPress={handleConfirmarEliminar}
+            >
+              Eliminar
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+
+        <Dialog visible={errorVisible} onDismiss={() => setErrorVisible(false)}>
+          <Dialog.Icon icon="alert-outline" />
+          <Dialog.Title>Error</Dialog.Title>
+          <Dialog.Content>
+            <Text variant="bodyMedium">{mensajeError}</Text>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setErrorVisible(false)}>Aceptar</Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
     </View>
   );
 }
@@ -136,6 +209,6 @@ const styles = StyleSheet.create({
   },
   etiqueta: { fontSize: 15 },
   valor: { fontSize: 15, fontWeight: "600" },
-  acciones: { marginTop: 24, marginBottom: 8 },
+  acciones: { marginTop: 24, marginBottom: 8, gap: 8 },
   boton: { borderRadius: 8 },
 });

@@ -14,6 +14,7 @@ export const isFirebaseConfigured = Boolean(
   firebaseConfig.apiKey && firebaseConfig.projectId
 );
 
+/** Inicializa Firebase App una sola vez durante el ciclo de vida de Metro. */
 function getFirebaseApp() {
   if (!isFirebaseConfigured) return null;
   return getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
@@ -37,6 +38,7 @@ const firestoreSettings: FirestoreSettingsWithStreams = {
   experimentalAutoDetectLongPolling: false,
 };
 
+/** Instancia compartida de Cloud Firestore; `null` si falta configuración. */
 export const db = app
   ? (firebaseGlobal.__gastosFirestore ??=
       initializeFirestore(app, firestoreSettings))

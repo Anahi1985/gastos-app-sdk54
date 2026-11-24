@@ -4,7 +4,6 @@ import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import { useCallback, useRef, useState } from "react";
 import {
-  Alert,
   Animated as RNAnimated,
   KeyboardAvoidingView,
   Platform,
@@ -12,7 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Button, Chip, Text, TextInput } from "react-native-paper";
+import { Button, Chip, Dialog, Portal, Text, TextInput } from "react-native-paper";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import ComprobanteAdjunto from "@/components/ComprobanteAdjunto";
 import ScreenWrapper from "@/components/ScreenWrapper";
@@ -29,6 +28,13 @@ type CategoriaChipProps = {
   seleccionada: boolean;
   onSelect: (id: string) => void;
   colors: Colors;
+};
+
+type DialogInfo = {
+  title: string;
+  message: string;
+  actionLabel?: string;
+  onAction?: () => void;
 };
 
 function CategoriaChip({ categoria, seleccionada, onSelect, colors }: CategoriaChipProps) {
@@ -105,8 +111,10 @@ export default function CrearGasto() {
   const [monto, setMonto] = useState("");
   const [categoria, setCategoria] = useState<string | null>(null);
   const [fecha, setFecha] = useState<Date>(new Date());
+  const [fechaTexto, setFechaTexto] = useState(() => fechaParaInput(new Date()));
   const [showPicker, setShowPicker] = useState(false);
   const [comprobanteUri, setComprobanteUri] = useState<string | null>(null);
+  const [dialog, setDialog] = useState<DialogInfo | null>(null);
 
   const onDateChange = useCallback((event: DateTimePickerEvent, selectedDate?: Date) => {
     if (Platform.OS === "android") {
@@ -115,6 +123,12 @@ export default function CrearGasto() {
     } else if (selectedDate) {
       setFecha(selectedDate);
     }
+  }, []);
+
+  const handleFechaTexto = useCallback((texto: string) => {
+    setFechaTexto(texto);
+    const fechaConvertida = fechaDesdeTexto(texto);
+    if (fechaConvertida) setFecha(fechaConvertida);
   }, []);
 
   const handleCategoria = useCallback((id: string) => setCategoria(id), []);
@@ -128,37 +142,45 @@ export default function CrearGasto() {
   const handleSubmit = useCallback(async () => {
     const nombreLugar = lugar.trim();
     const montoNum = parseMonto(monto);
-    const fechaStr = fechaISO(fecha);
+    const fechaStr =
+      Platform.OS === "web"
+        ? (fechaISODesdeTexto(fechaTexto) ?? fechaTexto.trim())
+        : fechaISO(fecha);
 
     if (!nombreLugar) {
-      Alert.alert("Falta el lugar", "Indicá el lugar o descripción del gasto.");
+      setDialog({ title: "Falta el lugar", message: "Indicá el lugar o descripción del gasto." });
       return;
     }
     if (!categoria) {
-      Alert.alert("Falta la categoría", "Seleccioná una categoría para el gasto.");
+      setDialog({ title: "Falta la categoría", message: "Seleccioná una categoría para el gasto." });
       return;
     }
     if (Number.isNaN(montoNum) || montoNum <= 0) {
-      Alert.alert("Monto inválido", "Ingresá un monto mayor a cero.");
+      setDialog({ title: "Monto inválido", message: "Ingresá un monto mayor a cero." });
       return;
     }
     if (!esFechaISOValida(fechaStr)) {
-      Alert.alert("Fecha inválida", "Seleccioná una fecha válida.");
+      setDialog({
+        title: "Fecha inválida",
+        message:
+          Platform.OS === "web"
+            ? "Ingresá una fecha válida con formato DD-MM-AAAA."
+            : "Seleccioná una fecha válida.",
+      });
       return;
     }
 
-    // Copiamos la imagen temporal a documentDirectory para que no se pierda.
     let comprobantePersistente: string | null = null;
     if (comprobanteUri) {
       try {
         comprobantePersistente = persistirComprobante(comprobanteUri);
       } catch {
-        Alert.alert("Error", "No se pudo guardar el comprobante.");
+        setDialog({ title: "Error", message: "No se pudo guardar el comprobante." });
         return;
       }
     }
 
-    const success = await saveGasto({
+    const resultado = await saveGasto({
       lugar: nombreLugar,
       categoria,
       monto: montoNum,
@@ -166,19 +188,25 @@ export default function CrearGasto() {
       ...(comprobantePersistente ? { comprobanteUri: comprobantePersistente } : {}),
     });
 
-    if (success) {
-      Alert.alert("¡Éxito!", "Gasto guardado correctamente");
+    if (resultado.ok) {
       setLugar("");
       setMonto("");
       setCategoria(null);
-      setFecha(new Date());
+      const hoy = new Date();
+      setFecha(hoy);
+      setFechaTexto(fechaParaInput(hoy));
       setComprobanteUri(null);
-      router.back();
+      setDialog({
+        title: "¡Éxito!",
+        message: "Gasto guardado correctamente",
+        actionLabel: "Volver",
+        onAction: () => router.back(),
+      });
     } else {
       if (comprobantePersistente) eliminarComprobante(comprobantePersistente);
-      Alert.alert("Error", "No se pudo guardar el gasto.");
+      setDialog({ title: "Error", message: resultado.error ?? "No se pudo guardar el gasto." });
     }
-  }, [lugar, monto, categoria, fecha, comprobanteUri, saveGasto, router]);
+  }, [lugar, monto, categoria, fecha, fechaTexto, comprobanteUri, saveGasto, router]);
 
   return (
     <View style={[styles.flex, { backgroundColor: colors.background }]}>
@@ -236,28 +264,47 @@ export default function CrearGasto() {
 
           <Animated.View entering={FadeInDown.delay(225)}>
             <Text style={styles.label}>Fecha</Text>
-            <TouchableOpacity
-              style={[styles.fechaBoton, { backgroundColor: colors.inputBackground, borderColor: colors.inputBorder }]}
-              onPress={() => setShowPicker(true)}
-            >
-              <Text style={styles.fechaTexto}>{fechaLegible(fecha)}</Text>
-            </TouchableOpacity>
-
-            {showPicker && (
+            {Platform.OS === "web" ? (
+              <TextInput
+                mode="outlined"
+                label="DD-MM-AAAA"
+                value={fechaTexto}
+                onChangeText={handleFechaTexto}
+                style={{ backgroundColor: colors.inputBackground }}
+                contentStyle={styles.inputContent}
+                outlineColor={colors.inputBorder}
+                activeOutlineColor={colors.primary}
+                placeholder="20-11-2026"
+                placeholderTextColor={colors.textDisabled}
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+            ) : (
               <>
-                <DateTimePicker
-                  value={fecha}
-                  mode="date"
-                  display={Platform.OS === "ios" ? "spinner" : "default"}
-                  onChange={onDateChange}
-                />
-                {Platform.OS === "ios" && (
-                  <TouchableOpacity
-                    style={[styles.listoIos, { backgroundColor: colors.primary }]}
-                    onPress={() => setShowPicker(false)}
-                  >
-                    <Text style={[styles.listoIosTexto, { color: colors.onPrimary }]}>Listo</Text>
-                  </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.fechaBoton, { backgroundColor: colors.inputBackground, borderColor: colors.inputBorder }]}
+                  onPress={() => setShowPicker(true)}
+                >
+                  <Text style={styles.fechaTexto}>{fechaLegible(fecha)}</Text>
+                </TouchableOpacity>
+
+                {showPicker && (
+                  <>
+                    <DateTimePicker
+                      value={fecha}
+                      mode="date"
+                      display={Platform.OS === "ios" ? "spinner" : "default"}
+                      onChange={onDateChange}
+                    />
+                    {Platform.OS === "ios" && (
+                      <TouchableOpacity
+                        style={[styles.listoIos, { backgroundColor: colors.primary }]}
+                        onPress={() => setShowPicker(false)}
+                      >
+                        <Text style={[styles.listoIosTexto, { color: colors.onPrimary }]}>Listo</Text>
+                      </TouchableOpacity>
+                    )}
+                  </>
                 )}
               </>
             )}
@@ -280,6 +327,26 @@ export default function CrearGasto() {
           </Animated.View>
         </ScreenWrapper>
       </KeyboardAvoidingView>
+
+      <Portal>
+        <Dialog visible={dialog !== null} onDismiss={() => setDialog(null)}>
+          <Dialog.Title>{dialog?.title}</Dialog.Title>
+          <Dialog.Content>
+            <Text variant="bodyMedium">{dialog?.message}</Text>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button
+              onPress={() => {
+                const accion = dialog?.onAction;
+                setDialog(null);
+                accion?.();
+              }}
+            >
+              {dialog?.actionLabel ?? "Aceptar"}
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
     </View>
   );
 }
@@ -288,6 +355,26 @@ function fechaISO(date: Date): string {
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
   return `${date.getFullYear()}-${month}-${day}`;
+}
+
+function fechaParaInput(date: Date): string {
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${day}-${month}-${date.getFullYear()}`;
+}
+
+function fechaISODesdeTexto(valor: string): string | null {
+  const coincidencia = /^(\d{2})-(\d{2})-(\d{4})$/.exec(valor.trim().replace(/\//g, "-"));
+  if (!coincidencia) return null;
+  const iso = `${coincidencia[3]}-${coincidencia[2]}-${coincidencia[1]}`;
+  return esFechaISOValida(iso) ? iso : null;
+}
+
+function fechaDesdeTexto(valor: string): Date | null {
+  const iso = fechaISODesdeTexto(valor);
+  if (!iso) return null;
+  const [year, month, day] = iso.split("-").map(Number);
+  return new Date(year, month - 1, day);
 }
 
 function fechaLegible(date: Date): string {

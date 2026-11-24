@@ -3,7 +3,6 @@ import { CameraType, CameraView, useCameraPermissions } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  Alert,
   AppState,
   Linking,
   Modal,
@@ -11,7 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Button, Card, IconButton, Text } from "react-native-paper";
+import { Button, Card, Dialog, IconButton, Portal, Text } from "react-native-paper";
 
 import ComprobanteImage from "@/components/ComprobanteImage";
 import { useTheme } from "@/context/ThemeContext";
@@ -21,9 +20,17 @@ interface ComprobanteAdjuntoProps {
   onChange: (uri: string | null) => void;
 }
 
+type DialogInfo = {
+  title: string;
+  message: string;
+  actionLabel?: string;
+  onAction?: () => void;
+};
+
 export default function ComprobanteAdjunto({ uri, onChange }: ComprobanteAdjuntoProps) {
   const { colors } = useTheme();
 
+  const [dialog, setDialog] = useState<DialogInfo | null>(null);
   const [showCamera, setShowCamera] = useState(false);
   const cameraRef = useRef<CameraView>(null);
   const [cameraPermission, requestCameraPermission, getCameraPermission] =
@@ -64,7 +71,8 @@ export default function ComprobanteAdjunto({ uri, onChange }: ComprobanteAdjunto
         setShowCamera(false);
       }
     } catch {
-      Alert.alert("Error", "No se pudo tomar la foto");
+      setShowCamera(false);
+      setDialog({ title: "Error", message: "No se pudo tomar la foto" });
     }
   };
 
@@ -84,19 +92,19 @@ export default function ComprobanteAdjunto({ uri, onChange }: ComprobanteAdjunto
     try {
       const permiso = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (!permiso.granted) {
-        Alert.alert(
-          "Permiso requerido",
-          "Necesitamos acceso a tus fotos para adjuntar el comprobante",
-          [
-            { text: "Cancelar", style: "cancel" },
-            { text: "Abrir configuración", onPress: () => Linking.openSettings() },
-          ]
-        );
+        setDialog({
+          title: "Permiso requerido",
+          message: "Necesitamos acceso a tus fotos para adjuntar el comprobante",
+          actionLabel: "Abrir configuración",
+          onAction: () => {
+            void Linking.openSettings().catch(() => undefined);
+          },
+        });
         return;
       }
       await abrirGaleria();
     } catch {
-      Alert.alert("Error", "No se pudo seleccionar la imagen");
+      setDialog({ title: "Error", message: "No se pudo seleccionar la imagen" });
     }
   };
 
@@ -198,6 +206,29 @@ export default function ComprobanteAdjunto({ uri, onChange }: ComprobanteAdjunto
           </View>
         )}
       </Modal>
+
+      <Portal>
+        <Dialog visible={dialog !== null} onDismiss={() => setDialog(null)}>
+          <Dialog.Title>{dialog?.title}</Dialog.Title>
+          <Dialog.Content>
+            <Text variant="bodyMedium">{dialog?.message}</Text>
+          </Dialog.Content>
+          <Dialog.Actions>
+            {dialog?.onAction ? (
+              <Button onPress={() => setDialog(null)}>Cancelar</Button>
+            ) : null}
+            <Button
+              onPress={() => {
+                const accion = dialog?.onAction;
+                setDialog(null);
+                accion?.();
+              }}
+            >
+              {dialog?.actionLabel ?? "Aceptar"}
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
     </View>
   );
 }
