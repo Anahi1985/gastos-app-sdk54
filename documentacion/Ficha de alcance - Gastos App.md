@@ -4,6 +4,8 @@
 
 > **Regla de oro:** un alcance chico y terminado vale más que uno enorme a medias. Si dudás si algo entra, **no entra** (queda en “para después”).
 
+**Entrega:** repositorio [gastos-app-sdk54](https://github.com/Anahi1985/gastos-app-sdk54) y build/APK Android con EAS `preview` (`com.nanhy.gastosappsdk54`).
+
 ---
 
 ## Ficha completada
@@ -20,8 +22,8 @@
 | 8 | **Datos:** ¿de dónde vienen y dónde se guardan? | **Gastos:** Firestore, base `(default)`, colección `gastos`, con `fecha` en ISO `YYYY-MM-DD` para ordenar. **Tema:** `AsyncStorage` en el celular. **Formularios/filtros:** `useState`. **Comprobante:** imagen local en el dispositivo (`comprobanteUri`), no se sube a la nube. |
 | 9 | **¿Hay usuarios / inicio de sesión?** ¿Para qué? | No. La app funciona en **modo prueba**; no identifica quién crea cada gasto. |
 | 10 | **¿Funciona sin internet?** ¿Qué se guarda en el celular? | El tema y la interfaz abren sin conexión. El listado, el alta, el borrado y las estadísticas necesitan Firestore/Internet; si falla, se muestra un mensaje real en un `Dialog` y se puede reintentar. En web, la fecha se escribe como `DD-MM-AAAA` y se convierte a ISO antes de guardar. |
-| 11 | **3 animaciones clave** (¿en qué momentos y por qué?) | 1. Las listas y barras entran en cascada con `FadeInDown` + delay para mostrar jerarquía.<br>2. Al cambiar de mes o recalcular totales, `LinearTransition` reacomod suavemente las filas.<br>3. Al abrir detalle/ajustes, `ZoomIn.springify()` da feedback de entrada; el formulario escalona sus campos con `FadeInDown`. |
-| 12 | **Riesgos** (¿qué podría salir mal?) y **plan B** | Si falla Firebase o la red → error visible en `Dialog` con reintento. Si falla el celular/emulador → probar en navegador o con APK EAS. En web, `Alert` no existe y `DateTimePicker` no funciona → se usan `Dialog` de Paper y texto `DD-MM-AAAA`. Los comprobantes son locales: se pierden al desinstalar. |
+| 11 | **3 animaciones clave** (¿en qué momentos y por qué?) | 1. Las listas y barras entran en cascada con `FadeInDown` + delay para mostrar jerarquía.<br>2. Al cambiar de mes o recalcular totales, `LinearTransition` reacomoda suavemente las filas.<br>3. Al abrir detalle/ajustes, `ZoomIn.springify()` da feedback de entrada; el formulario escalona sus campos con `FadeInDown`. |
+| 12 | **Riesgos** (¿qué podría salir mal?) y **plan B** | Si falla Firebase o la red → error visible en `Dialog` con reintento. Si falla el celular/emulador → probar en navegador o con APK EAS. En web, `Alert` no existe y `DateTimePicker` no funciona → se usan `Dialog` de Paper y texto `DD-MM-AAAA`. En `app/config/firebase.ts` se usa `useFetchStreams: false` con long polling forzado (`experimentalForceLongPolling: true`, `experimentalAutoDetectLongPolling: false`) para estabilizar React Native en redes o emuladores con restricciones. Los comprobantes son locales: se pierden al desinstalar. |
 | 13 | **Hitos:** qué estará listo en la Clase 12 / 13 / 14 | **Clase 12:** Firestore con CRUD real, Drawer + Tabs, tema y estadísticas.<br>**Clase 13:** QA, correcciones web/fecha y build EAS `preview`.<br>**Clase 14:** entrega con APK y esta ficha como documentación del alcance. |
 
 ### Mapa de navegación (pregunta 7)
