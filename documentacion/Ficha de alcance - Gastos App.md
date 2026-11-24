@@ -68,6 +68,16 @@ Stack
 - Permisos con `AppState` y `!canAskAgain` → “Abrir configuración”; comprobante copiado a `documentDirectory` antes de guardar.
 - README con instrucciones de ejecución, Firebase, EAS, esta ficha y capturas.
 
+## Escalabilidad y mejoras futuras
+
+Estas funcionalidades quedan fuera del alcance actual del TIF y son líneas naturales de evolución para próximas versiones de Gastos App:
+
+- **Ingresos mensuales y balance:** registrar un ingreso base o múltiples ingresos por mes para calcular el saldo disponible frente al total de gastos del período.
+- **Presupuestos por categoría y alertas:** configurar topes mensuales por categoría (Comida, Transporte, Salud, etc.) y mostrar avisos preventivos al alcanzar o superar el umbral.
+- **Autenticación y aislamiento por usuario:** integrar Firebase Authentication y asociar los documentos de Firestore a un `userId`, con reglas de seguridad por usuario.
+- **Comprobantes en la nube:** migrar `comprobanteUri` desde almacenamiento local a Firebase Storage para acceder a las imágenes desde cualquier dispositivo.
+- **Consultas y modo offline:** agregar paginación y caché local sincronizada para sostener el rendimiento con historiales grandes.
+
 ---
 
 ## Chequeo final de un buen alcance
