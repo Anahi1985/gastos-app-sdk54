@@ -66,7 +66,7 @@ Stack
 - Paletas claras/oscuras traducidas a MD3 con `getPaperTheme()`, `useMemo`/`useCallback` y regla del color aplicada a `.ts`/`.tsx`. Única excepción nativa: los 3 colores de `app.json` para icono y splash.
 - FAB con `primary`/`onPrimary`, `Text`/`TextInput` de Paper y copia del array antes de ordenar en `GastosScreen`.
 - Permisos con `AppState` y `!canAskAgain` → “Abrir configuración”; comprobante copiado a `documentDirectory` antes de guardar.
-- README con instrucciones de ejecución, Firebase, EAS, esta ficha y capturas.
+- README con instrucciones de ejecución, Firebase, EAS, esta ficha, pitch, capturas y build preview `3e77acdc-f0c8-4586-a827-c323438a028b`.
 
 ## Escalabilidad y mejoras futuras
 
@@ -89,3 +89,7 @@ Estas funcionalidades quedan fuera del alcance actual del TIF y son líneas natu
 - [x] Es algo que puedo **terminar y probar** antes de la Clase 14.
 - [x] Tengo un **plan B** si falla una parte (Internet, Firebase, web).
 - [x] Validación en vivo realizada en celular.
+- [x] Se consume un servicio remoto real (Cloud Firestore) con validación de datos.
+- [x] Build/APK generado para pruebas: `3e77acdc-f0c8-4586-a827-c323438a028b` (perfil `preview`).
+- [ ] Hay una demo funcional grabada o presentada en vivo.
+- [ ] Tengo un plan B de demo (video grabado).
