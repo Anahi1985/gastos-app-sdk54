@@ -225,7 +225,7 @@ Los hooks exponen `loading`/`error` y devuelven `{ ok, error }` para que la pant
 
 ### Build y QA
 
-El perfil `preview` de `eas.json` genera `.apk` con EAS; el repositorio incluye capturas en `assets/screenshots/`, la ficha de alcance y el pitch en `documentacion/`, y los chequeos `npx tsc --noEmit`, `npm run lint` y exports de Expo. La validación en dispositivo físico se realizó con el build `3e77acdc-f0c8-4586-a827-c323438a028b`.
+El perfil `preview` de `eas.json` genera `.apk` con EAS; el repositorio incluye capturas en `assets/screenshots/`, la ficha de alcance, el pitch y la demo grabada en `documentacion/`, y los chequeos `npx tsc --noEmit`, `npm run lint` y exports de Expo. La validación en dispositivo físico se realizó con el build `3e77acdc-f0c8-4586-a827-c323438a028b`.
 
 ## Arquitectura
 
@@ -285,6 +285,7 @@ eas.json                        # Perfil preview con android.buildType: apk
 
 - [Ficha de alcance — Gastos App](./documentacion/Ficha%20de%20alcance%20-%20Gastos%20App.md)
 - [Pitch y presentación — Gastos App](./documentacion/Pitch%20-%20Gastos%20App.md)
+- [Demo funcional grabada (mp4)](./documentacion/demo_gastos_app.mp4)
 
 ## Correcciones aplicadas
 

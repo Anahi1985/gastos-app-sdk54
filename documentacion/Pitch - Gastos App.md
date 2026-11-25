@@ -71,7 +71,7 @@ Muchas gracias por su atención. Estamos abiertos a preguntas.
 - [ ] Verificar conexión a internet o explicar el comportamiento sin conexión.
 - [ ] Ensayar la navegación paso a paso.
 - [ ] Probar en el dispositivo o emulador antes de la presentación.
-- [ ] Tener un video de la demo como plan B.
+- [x] Tener un video de la demo como plan B: `demo_gastos_app.mp4`.
 - [ ] Revisar tiempos: 5 minutos aproximados.
 - [ ] Mostrar casos clave: instalación, flujo principal y diferenciador.
 
@@ -79,4 +79,5 @@ Muchas gracias por su atención. Estamos abiertos a preguntas.
 
 - [README del proyecto](../README.md)
 - [Ficha de alcance](./Ficha%20de%20alcance%20-%20Gastos%20App.md)
+- [Demo funcional grabada (mp4)](./demo_gastos_app.mp4)
 - [Build preview en EAS](https://expo.dev/accounts/nanhy/projects/gastos-app-sdk54/builds/3e77acdc-f0c8-4586-a827-c323438a028b)
