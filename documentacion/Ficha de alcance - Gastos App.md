@@ -77,6 +77,7 @@ Estas funcionalidades quedan fuera del alcance actual del TIF y son líneas natu
 - **Autenticación y aislamiento por usuario:** integrar Firebase Authentication y asociar los documentos de Firestore a un `userId`, con reglas de seguridad por usuario.
 - **Comprobantes en la nube:** actualmente la app almacena únicamente la referencia local del archivo en el dispositivo (comprobanteUri), por lo que la imagen no se sube ni se visualiza desde otros equipos. Como mejora futura, se plantea integrar Firebase Storage para subir el archivo binario y guardar su URL pública/descargable en Firestore, permitiendo consultar los comprobantes desde cualquier dispositivo.
 - **Consultas y modo offline:** agregar paginación y caché local sincronizada para sostener el rendimiento con historiales grandes.
+- **Ordenamiento cronológico y `createdAt`:** el listado actual ordena por `fecha` descendente y desempata por id, por lo que dos gastos del mismo día no reflejan necesariamente el orden de carga. Se prevé incorporar `createdAt` como marca de tiempo ISO opcional para ordenar por inserción real; un `orderBy` de un solo campo no requiere índice compuesto, que recién sería necesario al combinar filtros avanzados.
 
 ---
 

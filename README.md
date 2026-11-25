@@ -110,6 +110,8 @@ Los hooks normalizan el resultado: alta y borrado devuelven `{ ok, error? }`, mi
 5. **Borrado:** el detalle pide confirmación real con `Dialog` y elimina el documento por id.
 6. **Errores:** cada operación muestra el mensaje real en un `Dialog` y ofrece reintento; no hay excepciones relanzadas a la UI.
 
+> **Nota de ordenamiento:** `fecha` representa el día del gasto, no el momento de carga. Hoy `getGastos()` usa `orderBy("fecha", "desc")` (un solo campo, sin índice compuesto) y la pantalla desempata por id; para reflejar el orden real de inserción se prevé incorporar `createdAt` como marca de tiempo ISO opcional, sin afectar los documentos existentes.
+
 ## Comportamiento web y guardado
 
 En web, `react-native-web` no implementa `Alert.alert` y `DateTimePicker` no está disponible. Por eso:
