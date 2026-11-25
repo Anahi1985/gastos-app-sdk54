@@ -287,7 +287,9 @@ eas.json                        # Perfil preview con android.buildType: apk
 
 - [Ficha de alcance — Gastos App](./documentacion/Ficha%20de%20alcance%20-%20Gastos%20App.md)
 - [Pitch y presentación — Gastos App](./documentacion/Pitch%20-%20Gastos%20App.md)
-- [Demo funcional grabada (mp4)](./documentacion/demo_gastos_app.mp4)
+- [Demo funcional grabada (mp4)](./documentacion/demo_gastos_app.mp4) · [Reproducción directa en Google Drive](https://drive.google.com/file/d/158hiu5OcBfVQ8KK_r5PCE7jlRiRqZ9Hp/view?usp=sharing)
+  - `00:00–01:18`: flujo completo en la app (alta, listado, resumen/estadísticas y borrado).
+  - `01:19–02:10`: verificación en Cloud Firestore (documentos persistidos en la colección `gastos`).
 
 ## Correcciones aplicadas
 
