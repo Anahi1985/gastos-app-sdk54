@@ -2,11 +2,11 @@
 
 Aplicación de registro de gastos en **Expo SDK 54 / React Native** con **Drawer + Tabs**, **tema global claro/oscuro persistido**, una **paleta de marca centralizada**, animaciones con Reanimated, persistencia en **Cloud Firestore**, diálogos compatibles con web y builds Android `.apk` con **EAS Build**.
 
-**Repositorio:** [gastos-app-sdk54](https://github.com/Anahi1985/gastos-app-sdk54) · **Build preview:** [EAS build `3e77acdc`](https://expo.dev/accounts/nanhy/projects/gastos-app-sdk54/builds/3e77acdc-f0c8-4586-a827-c323438a028b)
+**Repositorio:** [gastos-app-sdk54](https://github.com/Anahi1985/gastos-app-sdk54) · **Build preview:** [EAS build `3e77acdc`](https://expo.dev/accounts/nanhy/projects/gastos-app-sdk54/builds/3e77acdc-f0c8-4586-a827-c323438a028b) (requiere login con la cuenta `nanhy`).
 
 ## Instalación
 
-Requisitos: Node.js, npm y, para Android, un emulador o dispositivo con la app **Expo Go**.
+Requisitos: Node.js y npm. Para `npm start`/`npm run android` se usa Expo Go en un emulador o dispositivo; el `.apk` de EAS se instala directamente sin Expo Go.
 
 ```bash
 # 1. Dependencias (desde la raíz)
@@ -90,7 +90,7 @@ Ejemplo de documento guardado en `gastos/{id}` (el `id` lo genera Firestore):
 }
 ```
 
-Los hooks normalizan el resultado: alta y borrado devuelven `{ ok, error? }`, mientras que el listado expone `loading`, `error` y `getGastos` para reintentar. Los mensajes se muestran con `Dialog` de Paper; en web no se usa `Alert`.
+Los hooks normalizan el resultado: `saveGasto`/`deleteGasto` devuelven `{ ok, error? }`, mientras que `useGetGastos` expone `loading`, `error` y `getGastos` para reintentar. Los mensajes de alta/borrado y validación se muestran con `Dialog` de Paper; los errores de carga se muestran inline con `Text` y botón `Reintentar`; en web no se usa `Alert`.
 
 ## Persistencia
 
@@ -98,32 +98,32 @@ Los hooks normalizan el resultado: alta y borrado devuelven `{ ok, error? }`, mi
 | :--- | :--- | :--- |
 | Gastos | Cloud Firestore | Colección `gastos`, base `(default)`, con `fecha` en ISO `YYYY-MM-DD`. |
 | Tema claro/oscuro | AsyncStorage | Clave `@gastos:theme` mediante `hooks/useStoredState.ts` y `context/ThemeContext.tsx`. |
-| Comprobantes | Archivo local | Se copian a `Paths.document/comprobantes`; la imagen no se sube a la nube. |
+| Comprobantes | Archivo local en Android/iOS; URI original en web | En nativo se copian a `Paths.document/comprobantes`; en web se conserva la URI devuelta por cámara/galería; la imagen no se sube a la nube. |
 | Configuración Firebase | `.env` / EAS env | Variables `EXPO_PUBLIC_FIREBASE_*`; `.env` está ignorado por Git. |
 
 ## Lógica del negocio
 
 1. **Alta:** se validan lugar, categoría, monto (`> 0`) y fecha. En web, `DD-MM-AAAA` se convierte a ISO antes de guardar.
-2. **Comprobante:** si hay imagen, se persiste localmente y su ruta se guarda como `comprobanteUri`; si falla, no se guarda el gasto.
+2. **Comprobante:** si hay imagen, en Android/iOS se persiste localmente y su ruta se guarda como `comprobanteUri` (en web se conserva la URI original); si falla la persistencia nativa, no se guarda el gasto.
 3. **Listado:** `getGastos()` ordena por `fecha` descendente y la pantalla desempata por id; el refresh manual y el foco recargan los datos.
 4. **Resumen y estadísticas:** filtran por mes (`YYYY-MM`) y calculan totales, porcentajes y barras por categoría.
 5. **Borrado:** el detalle pide confirmación real con `Dialog` y elimina el documento por id.
-6. **Errores:** cada operación muestra el mensaje real en un `Dialog` y ofrece reintento; no hay excepciones relanzadas a la UI.
+6. **Errores:** alta y borrado muestran el mensaje real en un `Dialog`; la carga fallida muestra el error inline con `Reintentar`; no hay excepciones relanzadas a la UI.
 
-> **Nota de ordenamiento:** `fecha` representa el día del gasto, no el momento de carga. Hoy `getGastos()` usa `orderBy("fecha", "desc")` (un solo campo, sin índice compuesto) y la pantalla desempata por id; para reflejar el orden real de inserción se prevé incorporar `createdAt` como marca de tiempo ISO opcional, sin afectar los documentos existentes.
+> **Nota de ordenamiento:** `fecha` representa el día del gasto, no el momento de carga. Hoy `getGastos()` usa `orderBy("fecha", "desc")` (un solo campo, sin índice compuesto) y la pantalla desempata por id; `createdAt` **no está implementado**. Se prevé incorporarlo como marca de tiempo ISO opcional con fallback/backfill para no excluir documentos existentes.
 
 ## Comportamiento web y guardado
 
 En web, `react-native-web` no implementa `Alert.alert` y `DateTimePicker` no está disponible. Por eso:
 
-- La confirmación de borrado, los errores de permisos/cámara/galería, las validaciones y el resultado del alta usan `Dialog` + `Portal` de `react-native-paper`. Si Firestore falla, se muestra el mensaje real y se puede reintentar.
+- La confirmación de borrado, los errores de permisos/cámara/galería, las validaciones y el resultado del alta usan `Dialog` + `Portal` de `react-native-paper`. Si falla la carga, el error se muestra inline con `Reintentar`; si falla alta o borrado, se muestra el mensaje real en `Dialog` y se reintenta reenviando la acción.
 - La fecha se escribe como `DD-MM-AAAA` (acepta `-` o `/`) y se convierte a ISO `YYYY-MM-DD` antes de guardar en Firestore. En Android/iOS se mantiene `DateTimePicker`.
 - Después de guardar **no se vuelve automáticamente** al listado: aparece “¡Éxito!” y el botón “Volver” ejecuta `router.back()`.
-- Los hooks `use-post-gasto.tsx` y `use-delete-gasto.tsx` devuelven `{ ok, error }`, y `use-gastos.tsx` expone `getGastos` para reintentar la carga.
+- Las funciones `saveGasto` y `deleteGasto` devuelven `{ ok, error? }`, y sus hooks exponen además `loading`/`error`; `use-gastos.tsx` expone `getGastos` para reintentar la carga.
 
 ## Testing y QA
 
-No hay suites unitarias en esta entrega: `jest`, `jest-expo`, `@types/jest`, `@testing-library/react-native` y `react-test-renderer` están declarados en `devDependencies`, pero todavía no hay archivos `*.test.*`. La verificación realizada fue:
+No hay suites unitarias en esta entrega: `jest`, `jest-expo`, `@types/jest`, `@testing-library/react-native` y `react-test-renderer` están declarados en `devDependencies` y existen scripts `test`/`test:watch`, pero `test:watch` usa `--watcAll` y la config tiene `moduleNaameMapper` (typos), así que la base de pruebas no está operativa; todavía no hay archivos `*.test.*`. La verificación realizada fue:
 
 - `npx tsc --noEmit` para chequeo estático de tipos.
 - `npm run lint` (`expo lint`) para reglas de ESLint.
@@ -145,7 +145,7 @@ eas build -p android --profile preview
 
 El artefacto descargable desde el dashboard de EAS es un `.apk` listo para instalar en un teléfono físico o emulador Android.
 
-El build final verificado es `3e77acdc-f0c8-4586-a827-c323438a028b` ([ver en EAS](https://expo.dev/accounts/nanhy/projects/gastos-app-sdk54/builds/3e77acdc-f0c8-4586-a827-c323438a028b)): perfil `preview`, estado `FINISHED` y commit `f0faa18`. El build anterior (`e5116311-44e5-4ee0-81c2-4e1a83875a35`) queda como referencia histórica y no incluye los fixes de diálogos web, fecha editable ni manejo de errores.
+El build final declarado es `3e77acdc-f0c8-4586-a827-c323438a028b` ([ver en EAS](https://expo.dev/accounts/nanhy/projects/gastos-app-sdk54/builds/3e77acdc-f0c8-4586-a827-c323438a028b)): perfil `preview`, estado `FINISHED` verificado con `eas build:view` y commit `f0faa18`. El build anterior (`e5116311-44e5-4ee0-81c2-4e1a83875a35`) queda como referencia histórica y no incluye los fixes de diálogos web, fecha editable ni manejo de errores.
 
 ## Capturas
 
@@ -231,7 +231,7 @@ El perfil `preview` de `eas.json` genera `.apk` con EAS; el repositorio incluye 
 
 ## Arquitectura
 
-El proyecto está separado por capas: `app/` contiene las rutas de `expo-router`, `components/` los componentes reutilizables, `hooks/` la lógica de datos y validación, `context/` el estado compartido, `constants/` modelos/paletas/API y `styles/` los estilos comunes. Los archivos sensibles quedan fuera de Git y se inyectan como variables `EXPO_PUBLIC_FIREBASE_*`.
+El proyecto está separado por capas: `app/` contiene las rutas de `expo-router` y la validación del formulario, `components/` los componentes reutilizables, `hooks/` la lógica de datos (carga, alta y borrado), `context/` el estado compartido, `constants/` modelos/paletas/API/formatos y `styles/` los estilos comunes. Los archivos sensibles quedan fuera de Git y se inyectan como variables `EXPO_PUBLIC_FIREBASE_*`.
 
 ### Mapa de navegación
 
@@ -264,7 +264,14 @@ app/_layout.tsx                 # GestureHandlerRootView + providers + Stack ra�
 app/(drawer)/_layout.tsx        # Menú lateral
 app/(drawer)/(tabs)/_layout.tsx # Barra de pestañas
 app/(drawer)/estadisticas.tsx   # Estadísticas por categoría
-components/                     # GastoItem, ScreenWrapper, ComprobanteAdjunto, DetalleContenido, CategoriaBarChart
+components/                     # GastoItem, ScreenWrapper, StackHeader, ComprobanteAdjunto, ComprobanteImage, DetalleContenido, CategoriaBarChart
+app/(drawer)/(tabs)/index.tsx   # Listado, filtros, refresh y FAB
+app/(drawer)/(tabs)/resumen.tsx # Resumen mensual por categoría
+app/crear.tsx                   # Alta y validación
+app/detalle.tsx                 # Pantalla detalle (delega en DetalleContenido)
+constants/files.ts              # Copia/borrado de comprobantes
+constants/categories.ts         # Catálogo de categorías
+constants/format.ts             # Formato y validación de fecha
 styles/sharedStyles.ts          # Espaciados, radios y estilos compartidos
 eas.json                        # Perfil preview con android.buildType: apk
 ```
@@ -276,12 +283,12 @@ eas.json                        # Perfil preview con android.buildType: apk
 | `expo` / `expo-router` | Runtime SDK 54 y navegación por archivos. |
 | `react-native` / `react-native-web` | UI nativa y compatibilidad con navegador. |
 | `firebase` | Inicialización de Firebase y operaciones Cloud Firestore. |
-| `@react-navigation/drawer` / `bottom-tabs` / `native` | Menú lateral, pestañas y tipado de navegación. |
+| `@react-navigation/drawer` / `bottom-tabs` / `native` / `native-stack` | Menú lateral, pestañas, hooks de navegación y tipado (`NativeStackScreenProps`). |
 | `react-native-paper` | Componentes MD3, tema, `Dialog`, `Portal` y `ProgressBar`. |
 | `react-native-reanimated` / `gesture-handler` / `screens` | Animaciones, gestos y rendimiento de pantallas. |
 | `@react-native-async-storage/async-storage` | Persistencia local del tema. |
 | `expo-camera` / `expo-image-picker` / `expo-file-system` | Comprobantes y permisos. |
-| `typescript` / `eslint` / `jest` | Tipado, lint y base de pruebas (sin suites aún). |
+| `typescript` / `eslint` / `jest` | Tipado, lint y dependencias de pruebas (sin suites aún; scripts/config con typos). |
 
 ## Documentación
 
@@ -296,13 +303,13 @@ eas.json                        # Perfil preview con android.buildType: apk
 | Observación | Cómo quedó |
 | :--- | :--- |
 | `db.json`, `10.0.2.2`, `EXPO_PUBLIC_API_URL`, puerto `3000` y `/users` | Servidor eliminado: la app usa Firestore y `.env` solo contiene variables `EXPO_PUBLIC_FIREBASE_*`. |
-| `usePostGasto` y alta | `loading`/`error` + retorno `{ ok, error }`; la pantalla muestra `Dialog`, no `Alert`. |
+| `usePostGasto`/`saveGasto` y alta | `loading`/`error` en el hook + retorno `{ ok, error? }` de `saveGasto`; la pantalla muestra `Dialog`, no `Alert`. |
 | Validación de monto y fecha | `Number.isNaN`/`<= 0` y `esFechaISOValida` antes de guardar; fecha web `DD-MM-AAAA` convertida a ISO. |
-| `err: any` | Ninguno: los `catch` usan `e instanceof Error` con mensaje fallback. |
+| `err: any` | Ninguno: los `catch` ligados a Firestore usan `e instanceof Error` con mensaje fallback; los de comprobantes usan mensajes fijos o silencian el error al borrar. |
 | Theming | MD3 con `elevation`, `useMemo`/`useCallback`, regla del color y excepción nativa documentada arriba. |
 | FAB, Paper y orden | FAB con `primary`/`onPrimary`, `Text`/`TextInput` de Paper y copia del array antes de `.sort()`. |
-| Permisos y comprobantes | `AppState` re-lee permisos, `!canAskAgain` abre configuración y la imagen se copia a `documentDirectory`. |
-| README | Instrucciones de ejecución, Firebase, EAS, ficha de alcance y capturas. |
+| Permisos y comprobantes | `AppState` re-lee permisos, `!canAskAgain` abre configuración y en Android/iOS la imagen se copia a `Paths.document/comprobantes` (en web se conserva la URI original). |
+| README | Instrucciones de ejecución, Firebase, EAS, ficha de alcance, pitch, demo y capturas. |
 
 ### `constants/theme.ts`
 

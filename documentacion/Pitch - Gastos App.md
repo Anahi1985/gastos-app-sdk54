@@ -61,7 +61,7 @@ Como resultado, la app muestra errores reales con `Dialog`, convierte fechas `DD
 
 ## 7. Futuro y cierre (30 s)
 
-Las mejoras naturales son ingresos mensuales y balance, presupuestos por categoría con alertas, autenticación por usuario, comprobantes en Firebase Storage y consultas paginadas con soporte offline. Están detalladas en la [ficha de alcance](./Ficha%20de%20alcance%20-%20Gastos%20App.md).
+Las mejoras naturales son ingresos mensuales y balance, presupuestos por categoría con alertas, autenticación por usuario, comprobantes en Firebase Storage, consultas paginadas con soporte offline y ordenamiento cronológico con `createdAt` como marca ISO opcional. Están detalladas en la [ficha de alcance](./Ficha%20de%20alcance%20-%20Gastos%20App.md).
 
 Muchas gracias por su atención. Estamos abiertos a preguntas.
 
@@ -70,7 +70,7 @@ Muchas gracias por su atención. Estamos abiertos a preguntas.
 - [ ] Preparar los gastos de prueba en Firestore o cargarlos durante la demo.
 - [ ] Verificar conexión a internet o explicar el comportamiento sin conexión.
 - [ ] Ensayar la navegación paso a paso.
-- [ ] Probar en el dispositivo o emulador antes de la presentación.
+- [x] Validado en dispositivo físico con el build `3e77acdc-f0c8-4586-a827-c323438a028b` (revalidar antes de presentar si cambia el entorno).
 - [x] Tener un video de la demo como plan B: `demo_gastos_app.mp4`.
 - [ ] Revisar tiempos: 5 minutos aproximados.
 - [ ] Mostrar casos clave: instalación, flujo principal y diferenciador.
@@ -80,4 +80,4 @@ Muchas gracias por su atención. Estamos abiertos a preguntas.
 - [README del proyecto](../README.md)
 - [Ficha de alcance](./Ficha%20de%20alcance%20-%20Gastos%20App.md)
 - [Demo funcional grabada (mp4)](./demo_gastos_app.mp4)
-- [Build preview en EAS](https://expo.dev/accounts/nanhy/projects/gastos-app-sdk54/builds/3e77acdc-f0c8-4586-a827-c323438a028b)
+- [Build preview en EAS](https://expo.dev/accounts/nanhy/projects/gastos-app-sdk54/builds/3e77acdc-f0c8-4586-a827-c323438a028b) — requiere login con la cuenta `nanhy` para ver el artefacto.
